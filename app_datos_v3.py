@@ -8,23 +8,22 @@ from io import BytesIO
 #Función gráfica
 
 def show_graph(df, x_var, y_var, graph_type):
+    buf = BytesIO()
+
     if graph_type == "Gráfica de barras":
-        fig = plt.figure(figsize=(10, 7))
-        sns.barplot(x=x_var, y=y_var, data=df)
+        df.groupby(x_var)[y_var].sum().plot(kind='bar')
     elif graph_type == "Mapa de calor":
-        fig = plt.figure(figsize=(10, 7))
-        sns.heatmap(df.corr(), annot=True, cmap="coolwarm")
-    elif graph_type == "Gráfica de líneas":
-        fig = plt.figure(figsize=(10, 7))
-        sns.lineplot(x=x_var, y=y_var, data=df)
-    else:
-        fig = None
-    if fig is not None:
-        buf = BytesIO()
-        fig.savefig(buf, format='png')
-        return buf.getvalue()
-    else:
-        return None
+        plt.hist2d(df[x_var], df[y_var])
+        plt.colorbar()
+    else:  # "Gráfica de líneas"
+        df.groupby(x_var)[y_var].sum().plot(kind='line')
+
+    plt.tight_layout()
+    plt.savefig(buf, format="png")
+    plt.close()
+    buf.seek(0)
+    return buf
+
 
 # Función para obtener el link de descarga
 def create_download_link(file_id):
