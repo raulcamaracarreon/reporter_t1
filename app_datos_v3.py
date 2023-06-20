@@ -10,16 +10,17 @@ def create_download_link(file_id):
     return f'https://drive.google.com/uc?id={file_id}'
 
 # IDs de tus archivos en Google Drive
+directores_id = '18ZZ_AOXLef3cIu24rvtO3YmNM-CS9CxH'
 docentes_pre_id = '14dI5IetWsflUprLyURLYSC1XMWLLQ6BO'
 docentes_pri_id = '1mbV_IqFtAdYtCzbCVQSgA4rD_VViqe4M'
 docentes_sec_id = '12X7aNLjtgubaKWaKp_fmfmGplCRQAk-H'
 
 # Cargando los datos
-directores_url = 'https://raw.githubusercontent.com/raulcamaracarreon/reporter_t1/main/SPE2022_Dir_BD.csv'
-directores = pd.read_csv(directores_url)
+directores = pd.read_csv(create_download_link(directores_id))
 docentes_pre = pd.read_csv(create_download_link(docentes_pre_id))
 docentes_pri = pd.read_csv(create_download_link(docentes_pri_id))
 docentes_sec = pd.read_csv(create_download_link(docentes_sec_id))
+
 
 # Agregando columna de nivel educativo a cada dataframe de docentes
 docentes_pre['nivel_educativo'] = 'Preescolar'
@@ -29,7 +30,14 @@ docentes_sec['nivel_educativo'] = 'Secundaria'
 # Combinar todas las bases de datos de docentes
 docentes = pd.concat([docentes_pre, docentes_pri, docentes_sec])
 
-# Definir mostrar gráfica
+def to_csv(df):
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    return b64
+
+def show_dataframe(df):
+    st.write(df)
+
 def show_graph(df, x_var, y_var, graph_type):
     plt.figure(figsize=(10,6))
     if graph_type == "Gráfica de barras":
@@ -74,6 +82,7 @@ role_option = st.selectbox(
 
 if role_option == "Directores":
     df = directores
+    show_dataframe(df)
 else:
     # Opciones de niveles
     nivel_option = st.selectbox(
@@ -85,6 +94,8 @@ else:
     else:
         df = docentes
 
+    show_dataframe(df)
+
 x_var = st.selectbox("Selecciona la variable para el eje X", df.columns)
 y_var = st.selectbox("Selecciona la variable para el eje Y", df.columns)
 
@@ -95,11 +106,14 @@ graph_type = st.selectbox(
 
 buf = show_graph(df, x_var, y_var, graph_type)
 
+
+
 st.download_button(
     label="Descargar gráfica",
     data=buf,
     file_name='grafica.png',
     mime='image/png'
 )
+
 
 
