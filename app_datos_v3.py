@@ -21,7 +21,6 @@ docentes_pre = pd.read_csv(create_download_link(docentes_pre_id))
 docentes_pri = pd.read_csv(create_download_link(docentes_pri_id))
 docentes_sec = pd.read_csv(create_download_link(docentes_sec_id))
 
-
 # Agregando columna de nivel educativo a cada dataframe de docentes
 docentes_pre['nivel_educativo'] = 'Preescolar'
 docentes_pri['nivel_educativo'] = 'Primaria'
@@ -35,8 +34,20 @@ def to_csv(df):
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
     return b64
 
+# Limpieza de datos antes de mostrar el DataFrame
+def clean_data(df):
+    if df.isna().sum().sum() > 0:  # Comprueba si hay valores NaN en el DataFrame
+        st.write("El DataFrame contiene valores NaN. Los eliminaremos.")
+        df = df.dropna()  # Elimina las filas con valores NaN
+    return df
+
+# Función modificada para mostrar el DataFrame
 def show_dataframe(df):
-    st.write(df)
+    df = clean_data(df)
+    if df.empty:  # Comprobamos si el DataFrame está vacío
+        st.write("El DataFrame está vacío.")
+    else:
+        st.write(df)
 
 def show_graph(df, x_var, y_var, graph_type):
     plt.figure(figsize=(10,6))
@@ -106,11 +117,10 @@ graph_type = st.selectbox(
 
 buf = show_graph(df, x_var, y_var, graph_type)
 
-
-
 st.download_button(
     label="Descargar gráfica",
     data=buf,
     file_name='grafica.png',
     mime='image/png'
 )
+
