@@ -47,18 +47,18 @@ def show_graph(df, x_var, y_var, graph_type):
                                textcoords = 'offset points')
         else:
             ct = pd.crosstab(df[x_var], df[y_var])
-            st.write(ct)  # Muestra el dataframe
+            show_dataframe(ct)  # Utiliza la función show_dataframe para mostrar el dataframe
             ct.plot(kind="bar", stacked=True)
     elif graph_type == "Mapa de calor":
         ct = pd.crosstab(df[x_var], df[y_var])
-        st.write(ct)  # Muestra el dataframe
+        show_dataframe(ct)  # Utiliza la función show_dataframe para mostrar el dataframe
         sns.heatmap(ct, annot=True, fmt="d")
     elif graph_type == "Gráfica de líneas":
         if df[x_var].dtype in ['int64', 'float64'] and df[y_var].dtype in ['int64', 'float64']:
             sns.lineplot(data=df, x=x_var, y=y_var)
         else:
             ct = pd.crosstab(df[x_var], df[y_var])
-            st.write(ct)  # Muestra el dataframe
+            show_dataframe(ct)  # Utiliza la función show_dataframe para mostrar el dataframe
             ct.plot(kind="line")
 
     st.pyplot(plt.gcf())  # Agrega esta línea para mostrar la gráfica
@@ -89,9 +89,6 @@ else:
     else:
         df = docentes
 
-# Mostrar el dataframe seleccionado
-show_dataframe(df)
-
 x_var = st.selectbox("Selecciona la variable para el eje X", df.columns)
 y_var = st.selectbox("Selecciona la variable para el eje Y", df.columns)
 
@@ -99,13 +96,3 @@ graph_type = st.selectbox(
     "Selecciona un tipo de gráfica",
     ("Gráfica de barras", "Mapa de calor", "Gráfica de líneas")
 )
-
-buf = show_graph(df, x_var, y_var, graph_type)
-
-st.download_button(
-    label="Descargar gráfica",
-    data=buf,
-    file_name='grafica.png',
-    mime='image/png'
-)
-
