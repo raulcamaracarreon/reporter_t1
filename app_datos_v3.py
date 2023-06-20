@@ -11,16 +11,17 @@ def show_graph(df, x_var, y_var, graph_type):
     buf = BytesIO()
 
     if graph_type == "Gráfica de barras":
-        df.groupby(x_var)[y_var].sum().plot(kind='bar')
+        fig = plt.figure(figsize=(10, 7))
+        sns.barplot(x=x_var, y=y_var, data=df)
     elif graph_type == "Mapa de calor":
-        plt.hist2d(df[x_var], df[y_var])
-        plt.colorbar()
+        fig = plt.figure(figsize=(10, 7))
+        sns.heatmap(df.corr(), annot=True, cmap="coolwarm")
     else:  # "Gráfica de líneas"
-        df.groupby(x_var)[y_var].sum().plot(kind='line')
+        fig = plt.figure(figsize=(10, 7))
+        sns.lineplot(x=x_var, y=y_var, data=df)
 
     plt.tight_layout()
-    plt.savefig(buf, format="png")
-    plt.close()
+    fig.savefig(buf, format="png")
     buf.seek(0)
     return buf
 
