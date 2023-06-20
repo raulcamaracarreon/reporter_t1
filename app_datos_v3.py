@@ -1,4 +1,4 @@
-import streamlit as st
+mport streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -28,6 +28,10 @@ docentes_sec['nivel_educativo'] = 'Secundaria'
 
 # Combinar todas las bases de datos de docentes
 docentes = pd.concat([docentes_pre, docentes_pri, docentes_sec])
+
+# Función para mostrar el dataframe
+def show_dataframe(df):
+    st.write(df)
 
 # Definir mostrar gráfica
 def show_graph(df, x_var, y_var, graph_type):
@@ -63,42 +67,3 @@ def show_graph(df, x_var, y_var, graph_type):
     buf = BytesIO()
     plt.savefig(buf, format="png")
     buf.seek(0)
-
-    return buf
-
-# Opciones de roles
-role_option = st.selectbox(
-    "Selecciona un rol",
-    ("Directores", "Docentes")
-)
-
-if role_option == "Directores":
-    df = directores
-else:
-    # Opciones de niveles
-    nivel_option = st.selectbox(
-        "Selecciona un nivel",
-        ("Todos", "Preescolar", "Primaria", "Secundaria")
-    )
-    if nivel_option != "Todos":
-        df = docentes[docentes['nivel_educativo'] == nivel_option.lower()]
-    else:
-        df = docentes
-
-x_var = st.selectbox("Selecciona la variable para el eje X", df.columns)
-y_var = st.selectbox("Selecciona la variable para el eje Y", df.columns)
-
-graph_type = st.selectbox(
-    "Selecciona un tipo de gráfica",
-    ("Gráfica de barras", "Mapa de calor", "Gráfica de líneas")
-)
-
-buf = show_graph(df, x_var, y_var, graph_type)
-
-st.download_button(
-    label="Descargar gráfica",
-    data=buf,
-    file_name='grafica.png',
-    mime='image/png'
-)
-
