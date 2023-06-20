@@ -5,6 +5,27 @@ import seaborn as sns
 import base64
 from io import BytesIO
 
+#Función gráfica
+
+def show_graph(df, x_var, y_var, graph_type):
+    if graph_type == "Gráfica de barras":
+        fig = plt.figure(figsize=(10, 7))
+        sns.barplot(x=x_var, y=y_var, data=df)
+    elif graph_type == "Mapa de calor":
+        fig = plt.figure(figsize=(10, 7))
+        sns.heatmap(df.corr(), annot=True, cmap="coolwarm")
+    elif graph_type == "Gráfica de líneas":
+        fig = plt.figure(figsize=(10, 7))
+        sns.lineplot(x=x_var, y=y_var, data=df)
+    else:
+        fig = None
+    if fig is not None:
+        buf = BytesIO()
+        fig.savefig(buf, format='png')
+        return buf.getvalue()
+    else:
+        return None
+
 # Función para obtener el link de descarga
 def create_download_link(file_id):
     return f'https://drive.google.com/uc?id={file_id}'
@@ -72,6 +93,8 @@ graph_type = st.selectbox(
 )
 
 # Asegurarse de que hay datos antes de intentar graficar
+
+
 if not df[x_var].empty and not df[y_var].empty:
     buf = show_graph(df, x_var, y_var, graph_type)
 else:
