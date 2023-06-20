@@ -113,5 +113,5 @@ st.download_button(
     data=buf,
     file_name='grafica.png',
     mime='image/png'
-
+)
 
