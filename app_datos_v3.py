@@ -29,6 +29,10 @@ docentes_sec['nivel_educativo'] = 'Secundaria'
 # Combinar todas las bases de datos de docentes
 docentes = pd.concat([docentes_pre, docentes_pri, docentes_sec])
 
+# Función para mostrar el dataframe
+def show_dataframe(df):
+    st.write(df)
+
 # Definir mostrar gráfica
 def show_graph(df, x_var, y_var, graph_type):
     plt.figure(figsize=(10,6))
@@ -85,6 +89,9 @@ else:
     else:
         df = docentes
 
+# Mostrar el dataframe seleccionado
+show_dataframe(df)
+
 x_var = st.selectbox("Selecciona la variable para el eje X", df.columns)
 y_var = st.selectbox("Selecciona la variable para el eje Y", df.columns)
 
@@ -101,5 +108,4 @@ st.download_button(
     file_name='grafica.png',
     mime='image/png'
 )
-
 
