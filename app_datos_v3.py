@@ -71,7 +71,7 @@ else:
 if df.empty:
     st.write("No hay datos disponibles")
 else:
-    st.write(df)
+    st.dataframe(df)
 
 x_var = st.selectbox("Selecciona la variable para el eje X", df.columns)
 y_var = st.selectbox("Selecciona la variable para el eje Y", df.columns)
