@@ -14,13 +14,17 @@ docentes_pre_id = '14dI5IetWsflUprLyURLYSC1XMWLLQ6BO'
 docentes_pri_id = '1mbV_IqFtAdYtCzbCVQSgA4rD_VViqe4M'
 docentes_sec_id = '12X7aNLjtgubaKWaKp_fmfmGplCRQAk-H'
 
-# Cargando los datos
-directores_url = 'https://raw.githubusercontent.com/raulcamaracarreon/reporter_t1/main/SPE2022_Dir_BD.csv'
-directores = pd.read_csv(directores_url)
+try:
+    # Cargando los datos
+    directores_url = 'https://raw.githubusercontent.com/raulcamaracarreon/reporter_t1/main/SPE2022_Dir_BD.csv'
+    directores = pd.read_csv(directores_url)
 
-docentes_pre = pd.read_csv(create_download_link(docentes_pre_id))
-docentes_pri = pd.read_csv(create_download_link(docentes_pri_id))
-docentes_sec = pd.read_csv(create_download_link(docentes_sec_id))
+    docentes_pre = pd.read_csv(create_download_link(docentes_pre_id))
+    docentes_pri = pd.read_csv(create_download_link(docentes_pri_id))
+    docentes_sec = pd.read_csv(create_download_link(docentes_sec_id))
+
+except Exception as e:
+    st.write(f"Ha ocurrido un error al cargar los datos: {e}")
 
 # Agregando columna de nivel educativo a cada dataframe de docentes
 docentes_pre['nivel_educativo'] = 'Preescolar'
@@ -53,7 +57,11 @@ else:
 if df.empty:
     st.write("No hay datos disponibles")
 else:
-    st.write(df)
+    try:
+        st.write(df.info())
+        st.write(df.head())
+    except Exception as e:
+        st.write(f"Ha ocurrido un error al visualizar los datos: {e}")
 
 x_var = st.selectbox("Selecciona la variable para el eje X", df.columns)
 y_var = st.selectbox("Selecciona la variable para el eje Y", df.columns)
