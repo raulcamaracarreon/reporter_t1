@@ -8,6 +8,20 @@ from io import BytesIO
 # Función para obtener el link de descarga
 def create_download_link(file_id):
     return f'https://drive.google.com/uc?id={file_id}'
+# Definir mostrar gráfica
+def show_graph(df, x_var, y_var, graph_type):
+    if graph_type == "Gráfica de barras":
+        fig = df[[x_var, y_var]].groupby(x_var).sum().plot(kind='bar').get_figure()
+    elif graph_type == "Mapa de calor":
+        fig = sns.heatmap(df[[x_var, y_var]], annot=True).get_figure()
+    elif graph_type == "Gráfica de líneas":
+        fig = df[[x_var, y_var]].plot(kind='line').get_figure()
+
+    buf = BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    return buf
+
 
 # IDs de tus archivos en Google Drive
 docentes_pre_id = '14dI5IetWsflUprLyURLYSC1XMWLLQ6BO'
