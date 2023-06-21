@@ -9,29 +9,6 @@ from io import BytesIO
 def create_download_link(file_id):
     return f'https://drive.google.com/uc?id={file_id}'
 
-# Función para mostrar gráfico
-
-def show_graph(df, x_var, y_var, graph_type):
-    plt.figure(figsize=(10, 5))
-
-    if graph_type == "Gráfica de barras":
-        sns.barplot(data=df, x=x_var, y=y_var)
-    elif graph_type == "Mapa de calor":
-        # Para crear un mapa de calor, necesitamos una matriz de correlación
-        corr = df.corr()
-        sns.heatmap(corr, annot=True, cmap='coolwarm')
-    elif graph_type == "Gráfica de líneas":
-        sns.lineplot(data=df, x=x_var, y=y_var)
-
-    plt.title(f"{graph_type} de {y_var} vs {x_var}")
-    plt.xlabel(x_var)
-    plt.ylabel(y_var)
-
-    buf = BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
-    return buf
-
 # IDs de tus archivos en Google Drive
 docentes_pre_id = '14dI5IetWsflUprLyURLYSC1XMWLLQ6BO'
 docentes_pri_id = '1mbV_IqFtAdYtCzbCVQSgA4rD_VViqe4M'
@@ -94,18 +71,44 @@ graph_type = st.selectbox(
     ("Gráfica de barras", "Mapa de calor", "Gráfica de líneas")
 )
 
+# Función para mostrar el gráfico
+def show_graph(df, x_var, y_var, graph_type):
+    plt.figure(figsize=(10, 5))
+
+    if graph_type == "Gráfica de barras":
+        try:
+            sns.barplot(data=df, x=x_var, y=y_var)
+        except TypeError:
+            st.write(f"Las variables seleccionadas {x_var} y {y_var} no son adecuadas para un gráfico de barras.")
+            return None
+    elif graph_type == "Mapa de calor":
+        # Para crear un mapa de calor, necesitamos una matriz de correlación
+        corr = df.corr()
+        sns.heatmap(corr, annot=True, cmap='coolwarm')
+    elif graph_type == "Gráfica de líneas":
+        sns.lineplot(data=df, x=x_var, y=y_var)
+
+    plt.title(f"{graph_type} de {y_var} vs {x_var}")
+    plt.xlabel(x_var)
+    plt.ylabel(y_var)
+
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    return buf
+
 # Asegurarse de que hay datos antes de intentar graficar
 if not df[x_var].empty and not df[y_var].empty:
     buf = show_graph(df, x_var, y_var, graph_type)
+    if buf is not None:
+        st.download_button(
+            label="Descargar gráfica",
+            data=buf,
+            file_name='grafica.png',
+            mime='image/png'
+        )
 else:
     st.write("No hay datos suficientes para graficar")
-
-st.download_button(
-    label="Descargar gráfica",
-    data=buf,
-    file_name='grafica.png',
-    mime='image/png'
-)
 
 
 
