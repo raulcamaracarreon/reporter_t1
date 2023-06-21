@@ -71,20 +71,27 @@ ct = pd.crosstab(df[x_var], df[y_var])
 # Mostrar la tabla
 st.dataframe(ct)
 
-# Función para mostrar el gráfico
-def show_graph(ct):
-    ct.plot(kind='bar', stacked=True)
+# Función para crear el gráfico
+def create_graph(ct):
+    fig, ax = plt.subplots()
+    ct.plot(kind='bar', stacked=True, ax=ax)
     plt.title(f"Gráfico de barras de {x_var} vs {y_var}")
     plt.xlabel(x_var)
     plt.ylabel('conteo')
+    return fig
+
+# Función para guardar el gráfico
+def save_graph(fig):
     buf = BytesIO()
-    plt.savefig(buf, format='png')
+    fig.savefig(buf, format='png')
     buf.seek(0)
     return buf
 
 # Asegurarse de que hay datos antes de intentar graficar
 if not ct.empty:
-    buf = show_graph(ct)
+    fig = create_graph(ct)
+    st.pyplot(fig)  # mostrar la gráfica
+    buf = save_graph(fig)
     st.download_button(
         label="Descargar gráfica",
         data=buf,
@@ -93,8 +100,6 @@ if not ct.empty:
     )
 else:
     st.write("No hay datos suficientes para graficar")
-
-
 
 
 
