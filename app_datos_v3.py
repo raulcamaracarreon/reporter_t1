@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import base64
 from io import BytesIO
 
 # Función para obtener el link de descarga
@@ -66,49 +65,35 @@ else:
 x_var = st.selectbox("Selecciona la variable para el eje X", df.columns)
 y_var = st.selectbox("Selecciona la variable para el eje Y", df.columns)
 
-graph_type = st.selectbox(
-    "Selecciona un tipo de gráfica",
-    ("Gráfica de barras", "Mapa de calor", "Gráfica de líneas")
-)
+# Crear tabla de contingencia
+ct = pd.crosstab(df[x_var], df[y_var])
+
+# Mostrar la tabla
+st.dataframe(ct)
 
 # Función para mostrar el gráfico
-def show_graph(df, x_var, y_var, graph_type):
-    plt.figure(figsize=(10, 5))
-
-    if graph_type == "Gráfica de barras":
-        try:
-            sns.barplot(data=df, x=x_var, y=y_var)
-        except TypeError:
-            st.write(f"Las variables seleccionadas {x_var} y {y_var} no son adecuadas para un gráfico de barras.")
-            return None
-    elif graph_type == "Mapa de calor":
-        # Para crear un mapa de calor, necesitamos una matriz de correlación
-        corr = df.corr()
-        sns.heatmap(corr, annot=True, cmap='coolwarm')
-    elif graph_type == "Gráfica de líneas":
-        sns.lineplot(data=df, x=x_var, y=y_var)
-
-    plt.title(f"{graph_type} de {y_var} vs {x_var}")
+def show_graph(ct):
+    ct.plot(kind='bar', stacked=True)
+    plt.title(f"Gráfico de barras de {x_var} vs {y_var}")
     plt.xlabel(x_var)
-    plt.ylabel(y_var)
-
+    plt.ylabel('conteo')
     buf = BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
     return buf
 
 # Asegurarse de que hay datos antes de intentar graficar
-if not df[x_var].empty and not df[y_var].empty:
-    buf = show_graph(df, x_var, y_var, graph_type)
-    if buf is not None:
-        st.download_button(
-            label="Descargar gráfica",
-            data=buf,
-            file_name='grafica.png',
-            mime='image/png'
-        )
+if not ct.empty:
+    buf = show_graph(ct)
+    st.download_button(
+        label="Descargar gráfica",
+        data=buf,
+        file_name='grafica.png',
+        mime='image/png'
+    )
 else:
     st.write("No hay datos suficientes para graficar")
+
 
 
 
