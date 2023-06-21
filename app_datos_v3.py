@@ -56,50 +56,66 @@ else:
 if df.empty:
     st.write("No hay datos disponibles")
 else:
-    try:
-        st.write(df.info())
-        st.write(df.head())
-    except Exception as e:
-        st.write(f"Ha ocurrido un error al visualizar los datos: {e}")
+    x_var = st.selectbox("Selecciona la variable para el eje X", df.columns)
+    y_var = st.selectbox("Selecciona la variable para el eje Y", df.columns)
 
-x_var = st.selectbox("Selecciona la variable para el eje X", df.columns)
-y_var = st.selectbox("Selecciona la variable para el eje Y", df.columns)
+    # Crear tabla de contingencia
+    ct = pd.crosstab(df[x_var], df[y_var])
 
-# Crear tabla de contingencia
-ct = pd.crosstab(df[x_var], df[y_var])
+    # Crear tabla de contingencia de porcentajes
+    ct_pct = ct.apply(lambda r: r/r.sum()*100, axis=1)
 
-# Mostrar la tabla
-st.dataframe(ct)
+    # Mostrar las tablas
+    st.write("Tabla de Conteo")
+    st.dataframe(ct)
 
-# Función para crear el gráfico
-def create_graph(ct):
-    fig, ax = plt.subplots()
-    ct.plot(kind='bar', stacked=True, ax=ax)
-    plt.title(f"Gráfico de barras de {x_var} vs {y_var}")
-    plt.xlabel(x_var)
-    plt.ylabel('conteo')
-    return fig
-
-# Función para guardar el gráfico
-def save_graph(fig):
-    buf = BytesIO()
-    fig.savefig(buf, format='png')
-    buf.seek(0)
-    return buf
-
-# Asegurarse de que hay datos antes de intentar graficar
-if not ct.empty:
-    fig = create_graph(ct)
-    st.pyplot(fig)  # mostrar la gráfica
-    buf = save_graph(fig)
     st.download_button(
-        label="Descargar gráfica",
-        data=buf,
-        file_name='grafica.png',
-        mime='image/png'
+        label="Descargar tabla de conteo",
+        data=ct.to_csv(index=True).encode(),
+        file_name='tabla_conteo.csv',
+        mime='text/csv'
     )
-else:
-    st.write("No hay datos suficientes para graficar")
+
+    st.write("Tabla de Porcentajes")
+    st.dataframe(ct_pct)
+
+    st.download_button(
+        label="Descargar tabla de porcentajes",
+        data=ct_pct.to_csv(index=True).encode(),
+        file_name='tabla_porcentajes.csv',
+        mime='text/csv'
+    )
+
+    # Función para crear el gráfico
+    def create_graph(ct_pct):
+        fig, ax = plt.subplots()
+        ct_pct.plot(kind='bar', stacked=True, ax=ax)
+        plt.title(f"Gráfico de barras de {x_var} vs {y_var}")
+        plt.xlabel(x_var)
+        plt.ylabel('Porcentaje')
+        return fig
+
+    # Función para guardar el gráfico
+    def save_graph(fig):
+        buf = BytesIO()
+        fig.savefig(buf, format='png')
+        buf.seek(0)
+        return buf
+
+    # Asegurarse de que hay datos antes de intentar graficar
+    if not ct_pct.empty:
+        fig = create_graph(ct_pct)
+        st.pyplot(fig)  # mostrar la gráfica
+        buf = save_graph(fig)
+        st.download_button(
+            label="Descargar gráfica",
+            data=buf,
+            file_name='grafica.png',
+            mime='image/png'
+        )
+    else:
+        st.write("No hay datos suficientes para graficar")
+
 
 
 
