@@ -2,28 +2,29 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import base64
 from io import BytesIO
 
-# Función para obtener el link de descarga
-def create_download_link(file_id):
-    return f'https://drive.google.com/uc?id={file_id}'
+# Cargando los datos localmente
+directores = pd.read_csv('SPE2022_Dir_BD.csv')
+docentes_pre = pd.read_csv('SPE2022_Doc_Pre_BD.csv')
+docentes_pri_1 = pd.read_csv('SPE2022_Doc_Pri_BD_1.csv')
+docentes_pri_2 = pd.read_csv('SPE2022_Doc_Pri_BD_2.csv')
 
-# IDs de tus archivos en Google Drive
-docentes_pre_id = '14dI5IetWsflUprLyURLYSC1XMWLLQ6BO'
-docentes_pri_id = '1mbV_IqFtAdYtCzbCVQSgA4rD_VViqe4M'
-docentes_sec_id = '12X7aNLjtgubaKWaKp_fmfmGplCRQAk-H'
+# Combinar los dos archivos de docentes de primaria
+docentes_pri = pd.concat([docentes_pri_1, docentes_pri_2])
 
-try:
-    # Cargando los datos
-    directores_url = 'https://raw.githubusercontent.com/raulcamaracarreon/reporter_t1/main/SPE2022_Dir_BD.csv'
-    directores = pd.read_csv(directores_url)
+# Cargamos los archivos de docentes de secundaria
+docentes_sec_1 = pd.read_csv('SPE2022_Doc_Sec_BD_1.csv')
+docentes_sec_2 = pd.read_csv('SPE2022_Doc_Sec_BD_2.csv')
+docentes_sec_3 = pd.read_csv('SPE2022_Doc_Sec_BD_3.csv')
+docentes_sec_4 = pd.read_csv('SPE2022_Doc_Sec_BD_4.csv')
+docentes_sec_5 = pd.read_csv('SPE2022_Doc_Sec_BD_5.csv')
+docentes_sec_6 = pd.read_csv('SPE2022_Doc_Sec_BD_6.csv')
+docentes_sec_7 = pd.read_csv('SPE2022_Doc_Sec_BD_7.csv')
 
-    docentes_pre = pd.read_csv(create_download_link(docentes_pre_id))
-    docentes_pri = pd.read_csv(create_download_link(docentes_pri_id))
-    docentes_sec = pd.read_csv(create_download_link(docentes_sec_id))
-
-except Exception as e:
-    st.write(f"Ha ocurrido un error al cargar los datos: {e}")
+# Combinar todos los archivos de docentes de secundaria
+docentes_sec = pd.concat([docentes_sec_1, docentes_sec_2, docentes_sec_3, docentes_sec_4, docentes_sec_5, docentes_sec_6, docentes_sec_7])
 
 # Agregando columna de nivel educativo a cada dataframe de docentes
 docentes_pre['nivel_educativo'] = 'Preescolar'
@@ -32,6 +33,8 @@ docentes_sec['nivel_educativo'] = 'Secundaria'
 
 # Combinar todas las bases de datos de docentes
 docentes = pd.concat([docentes_pre, docentes_pri, docentes_sec])
+
+
 
 # Opciones de roles
 role_option = st.selectbox(
